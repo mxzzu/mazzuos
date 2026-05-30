@@ -6,10 +6,11 @@ set -ouex pipefail
 sed -i '/^\[main\]/a max_parallel_downloads=10' /etc/dnf/dnf.conf
 
 ## 2. Remove COSMIC Shell and Waybar
-dnf -y remove cosmic-comp cosmic-initial-setup cosmic-settings cosmic-settings-daemon cosmic-store waybar
+dnf -y remove cosmic-comp cosmic-initial-setup cosmic-settings cosmic-settings-daemon cosmic-store 
 
 ## 3. Install GNOME DE
-dnf -y group install "GNOME" --with-optional
+dnf group install -y "GNOME Desktop Environment"
+dnf install -y gdm gnome-session gnome-shell nautilus
 systemctl enable gdm.service
 
 # System apps
