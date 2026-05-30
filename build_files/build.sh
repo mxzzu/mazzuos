@@ -8,15 +8,6 @@ sed -i '/^\[main\]/a max_parallel_downloads=10' /etc/dnf/dnf.conf
 ## 2. Remove COSMIC Shell
 dnf -y remove cosmic-*
 
-# Remove cosmic flatpaks
-# (Usa || true per evitare che la build fallisca se alcuni non ci sono)
-flatpak uninstall --system -y com.system76.CosmicEditor || true
-flatpak uninstall --system -y com.system76.CosmicFiles || true
-flatpak uninstall --system -y com.system76.CosmicTerminal || true
-flatpak uninstall --system -y com.system76.CosmicPlayer || true
-flatpak uninstall --system -y com.system76.CosmicTasks || true
-flatpak uninstall --system -y com.system76.CosmicStore || true
-
 ## 3. Install GNOME DE
 dnf install -y \
     gdm \
@@ -33,7 +24,6 @@ dnf install -y \
     gnome-backgrounds \
     dconf-editor \
     gnome-shell-extension-dash-to-dock \
-    gnome-shell-extension-desktop-icons-ng
 
 systemctl enable gdm.service
 
