@@ -5,8 +5,17 @@ set -ouex pipefail
 ## DNF5 Speedup
 sed -i '/^\[main\]/a max_parallel_downloads=10' /etc/dnf/dnf.conf
 
-## 2. Remove COSMIC Shell and Waybar
-dnf -y remove cosmic-comp cosmic-initial-setup cosmic-settings cosmic-media-player cosmic-screenshot cosmic-terminal cosmic-files cosmic-text-editor cosmic-settings-daemon cosmic-store 
+## 2. Remove COSMIC Shell
+dnf -y remove cosmic-*
+
+# Remove cosmic flatpaks
+# (Usa || true per evitare che la build fallisca se alcuni non ci sono)
+flatpak uninstall --system -y com.system76.CosmicEditor || true
+flatpak uninstall --system -y com.system76.CosmicFiles || true
+flatpak uninstall --system -y com.system76.CosmicTerminal || true
+flatpak uninstall --system -y com.system76.CosmicPlayer || true
+flatpak uninstall --system -y com.system76.CosmicTasks || true
+flatpak uninstall --system -y com.system76.CosmicStore || true
 
 ## 3. Install GNOME DE
 dnf install -y \
@@ -17,18 +26,22 @@ dnf install -y \
     nautilus \
     gnome-control-center \
     gnome-terminal \
-    gnome-tweak-tool \
+    gnome-tweaks \
     xdg-desktop-portal-gnome \
     gnome-keyring \
-    gvfs-fuse
+    gvfs-fuse \
+    gnome-backgrounds \
+    dconf-editor \
+    gnome-shell-extension-dash-to-dock \
+    gnome-shell-extension-desktop-icons-ng
 
 systemctl enable gdm.service
 
 # System apps
-dnf install -y libvirt virt-manager qemu-kvm fastfetch startship
+dnf install -y libvirt virt-manager qemu-kvm
 
 # User apps
-dnf install -y kitty zsh
+dnf install -y kitty zsh unzip
 
 # Nautilus open any terminal extension
 curl -Lo /etc/yum.repos.d/nautilus-open-any-terminal.repo \
@@ -40,7 +53,6 @@ gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal kitty
 # Installing Terminal Font
 mkdir -p /usr/share/fonts/maple-mono-nf
 curl -L -o /tmp/MapleMono-NF.zip https://github.com/subframe7536/maple-font/releases/download/v7.9/MapleMono-NF.zip
-dnf install -y unzip
 unzip -o /tmp/MapleMono-NF.zip -d /usr/share/fonts/maple-mono-nf/
 rm /tmp/MapleMono-NF.zip
 fc-cache -f -v
@@ -74,10 +86,12 @@ if [ -f /etc/profile.d/origami-aliases.sh ]; then
 fi
 EOF
 
+cp /etc/zsh/zshrc /etc/skel/.zshrc
+
 # Install Spinner Theme
+dnf -y remove origami-plymouth-theme || true
 dnf install -y plymouth-theme-spinner
 plymouth-set-default-theme spinner
-true
 
 # Disable Origami tips
 sudo mv /etc/profile.d/origami-aliases.sh /etc/profile.d/origami-aliases.sh.bak
