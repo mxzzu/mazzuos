@@ -24,7 +24,7 @@ dnf install -y \
 systemctl enable gdm.service
 
 # System apps
-dnf install -y libvirt virt-manager qemu-kvm bitwarden-cli
+dnf install -y libvirt virt-manager qemu-kvm 
 
 # User apps
 dnf install -y kitty zsh
