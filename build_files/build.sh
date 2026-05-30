@@ -6,13 +6,14 @@ set -ouex pipefail
 sed -i '/^\[main\]/a max_parallel_downloads=10' /etc/dnf/dnf.conf
 
 ## 2. Remove COSMIC Shell and Waybar
-dnf -y remove cosmic-comp cosmic-initial-setup cosmic-settings cosmic-settings-daemon cosmic-store 
+dnf -y remove cosmic-comp cosmic-initial-setup cosmic-settings cosmic-media-player cosmic-screenshot cosmic-terminal cosmic-files cosmic-text-editor cosmic-settings-daemon cosmic-store 
 
 ## 3. Install GNOME DE
 dnf install -y \
     gdm \
     gnome-shell \
     gnome-session \
+    gnome-software \
     nautilus \
     gnome-control-center \
     gnome-terminal \
@@ -24,7 +25,7 @@ dnf install -y \
 systemctl enable gdm.service
 
 # System apps
-dnf install -y libvirt virt-manager qemu-kvm 
+dnf install -y libvirt virt-manager qemu-kvm fastfetch startship
 
 # User apps
 dnf install -y kitty zsh
