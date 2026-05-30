@@ -4,7 +4,6 @@ COPY build_files /
 
 # Base Image
 FROM registry.gitlab.com/origami-linux/images/origami:latest
-RUN sed -i 's/^ID=.*/ID=fedora/' /etc/os-release
 
 ## Other possible base images include:
 # FROM ghcr.io/ublue-os/bazzite:latest
