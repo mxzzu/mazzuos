@@ -9,8 +9,18 @@ sed -i '/^\[main\]/a max_parallel_downloads=10' /etc/dnf/dnf.conf
 dnf -y remove cosmic-comp cosmic-initial-setup cosmic-settings cosmic-settings-daemon cosmic-store 
 
 ## 3. Install GNOME DE
-dnf -y group install "gnome-desktop-environment"
-dnf install -y gdm gnome-session gnome-shell nautilus
+dnf install -y \
+    gdm \
+    gnome-shell \
+    gnome-session \
+    nautilus \
+    gnome-control-center \
+    gnome-terminal \
+    gnome-tweak-tool \
+    xdg-desktop-portal-gnome \
+    gnome-keyring \
+    gvfs-fuse
+
 systemctl enable gdm.service
 
 # System apps
