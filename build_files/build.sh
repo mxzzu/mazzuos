@@ -9,7 +9,7 @@ sed -i '/^\[main\]/a max_parallel_downloads=10' /etc/dnf/dnf.conf
 dnf -y remove cosmic-*
 
 ## 3. Install GNOME DE
-dnf install -y \
+dnf install -y --setopt=strict=0 \
     gdm \
     gnome-shell \
     gnome-session \
@@ -26,7 +26,6 @@ dnf install -y \
     gnome-shell-extension-dash-to-dock \
     gnome-settings-daemon \
     gnome-disk-utility \
-    polkit-gnome \
     file-roller \
     gnome-system-monitor
 
