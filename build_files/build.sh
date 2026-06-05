@@ -24,6 +24,11 @@ dnf install -y \
     gnome-backgrounds \
     dconf-editor \
     gnome-shell-extension-dash-to-dock \
+    gnome-settings-daemon \
+    gnome-disk-utility \
+    polkit-gnome \
+    file-roller \
+    gnome-system-monitor
 
 systemctl enable gdm.service
 
@@ -37,8 +42,14 @@ dnf install -y kitty zsh unzip
 curl -Lo /etc/yum.repos.d/nautilus-open-any-terminal.repo \
   https://copr.fedorainfracloud.org/coprs/monkeygold/nautilus-open-any-terminal/repo/fedora-$(rpm -E %fedora)/monkeygold-nautilus-open-any-terminal-fedora-$(rpm -E %fedora).repo
 dnf install -y nautilus-open-any-terminal
+
+cat << 'EOF' > /usr/share/glib-2.0/schemas/99-mazzuos.gschema.override
+[com.github.stunkymonkey.nautilus-open-any-terminal]
+terminal='kitty'
+EOF
+
 glib-compile-schemas /usr/share/glib-2.0/schemas
-gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal kitty
+#gsettings set com.github.stunkymonkey.nautilus-open-any-terminal terminal kitty
 
 # Installing Terminal Font
 mkdir -p /usr/share/fonts/maple-mono-nf
@@ -54,7 +65,30 @@ cp -rf /ctx/dot_config/kitty/kitty.conf /etc/skel/.config/kitty/
 systemctl enable podman.socket
 
 ## 5. ZSH & Starship Configuration 
-sed -i 's|SHELL=/bin/bash|SHELL=/bin/zsh|' /etc/default/useradd
+cat << 'EOF' > /usr/local/bin/set-user-shell.sh
+#!/bin/bash
+for user in $(awk -F: '$3 >= 1000 && $3 < 65534 {print $1}' /etc/passwd); do
+    usermod -s /bin/zsh "$user"
+done
+touch /var/lib/.shell-set
+EOF
+chmod +x /usr/local/bin/set-user-shell.sh
+
+cat << 'EOF' > /etc/systemd/system/set-user-shell.service
+[Unit]
+Description=Set default shell to zsh for existing users
+After=local-fs.target
+ConditionPathExists=!/var/lib/.shell-set
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/set-user-shell.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+systemctl enable set-user-shell.service
 
 mkdir -p /etc/zsh
 cat << 'EOF' > /etc/zsh/zshrc
@@ -84,7 +118,7 @@ dnf install -y plymouth-theme-spinner
 plymouth-set-default-theme spinner
 
 # Disable Origami tips
-sudo mv /etc/profile.d/origami-aliases.sh /etc/profile.d/origami-aliases.sh.bak
+mv /etc/profile.d/origami-aliases.sh /etc/profile.d/origami-aliases.sh.bak
 
 ## CLEAN UP
 # Clean up dnf cache to reduce image size
