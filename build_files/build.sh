@@ -64,13 +64,16 @@ cp -rf /ctx/dot_config/kitty/kitty.conf /etc/skel/.config/kitty/
 systemctl enable podman.socket
 
 ## 5. ZSH & Starship Configuration 
-cat << 'EOF' > /usr/local/bin/set-user-shell.sh
+mkdir -p /usr/local/bin
+
+cat > /usr/local/bin/set-user-shell.sh << 'SCRIPT'
 #!/bin/bash
 for user in $(awk -F: '$3 >= 1000 && $3 < 65534 {print $1}' /etc/passwd); do
     usermod -s /bin/zsh "$user"
 done
 touch /var/lib/.shell-set
-EOF
+SCRIPT
+
 chmod +x /usr/local/bin/set-user-shell.sh
 
 cat << 'EOF' > /etc/systemd/system/set-user-shell.service
