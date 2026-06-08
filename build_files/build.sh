@@ -64,31 +64,8 @@ cp -rf /ctx/dot_config/kitty/kitty.conf /etc/skel/.config/kitty/
 systemctl enable podman.socket
 
 ## 5. ZSH & Starship Configuration 
-cat > /usr/local/bin/set-user-shell.sh << 'SCRIPT'
-#!/bin/bash
-for user in $(awk -F: '$3 >= 1000 && $3 < 65534 {print $1}' /etc/passwd); do
-    usermod -s /bin/zsh "$user"
-done
-touch /var/lib/.shell-set
-SCRIPT
 
-chmod +x /usr/local/bin/set-user-shell.sh
-
-cat << 'EOF' > /etc/systemd/system/set-user-shell.service
-[Unit]
-Description=Set default shell to zsh for existing users
-After=local-fs.target
-ConditionPathExists=!/var/lib/.shell-set
-
-[Service]
-Type=oneshot
-ExecStart=/usr/local/bin/set-user-shell.sh
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-EOF
-systemctl enable set-user-shell.service
+# Rendere ZSH predefefinito
 
 mkdir -p /etc/zsh
 cat << 'EOF' > /etc/zsh/zshrc
